@@ -23,7 +23,7 @@ def run_pa(plan='CD_CR'):
         'interior_boundaries': interior_boundaries,
         'boundary_nodes': boundary_nodes,
         'cut_edges': cut_edges,
-        'areas': Tally('ALAND10', alias='areas'),
+        'areas': Tally('utm_area', alias='areas'),
         'polsby_popper': polsby_popper,
         'cut_edges_by_part': cut_edges_by_part
     }
