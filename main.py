@@ -12,13 +12,15 @@ from rundmcmc.validity import Validator, within_percent_of_ideal_population, L1_
 from rundmcmc.accept import always_accept
 from rundmcmc.proposals import propose_random_flip
 
+import sys
 import functools
-import pprint
+import json
+from pprint import pprint
 
 plans = ['CD_CR', 'CD_remedia', 'GOV_4_1', 'TS_4_1']
 
 
-def run_pa(plan='CD_CR'):
+def run_pa(plan, total_steps=10000000):
     graph = Graph.load('./wes_graph.json').graph
 
     assignment = {node: graph.nodes[node][plan] for node in graph.nodes}
@@ -57,14 +59,33 @@ def run_pa(plan='CD_CR'):
                          [population_constraint, compactness_constraint])
 
     chain = MarkovChain(propose_random_flip, is_valid,
-                        always_accept, partition, total_steps=1000000)
+                        always_accept, partition, total_steps)
 
     # chain = BasicChain(partition, total_steps=1000000)
 
     table = pipe_to_table(chain, scores)
 
-    return {key: p_value_report(key, table[key], initial_scores[key]) for key in scores}
+    metadata = {
+        'plan': plan,
+        'total_steps': total_steps,
+        'constraints': [
+            'L1 Reciprocal Polsby-Popper no more than 1% worse than the initial plan.',
+            'District populations within one percent of ideal.',
+            'Districts are contiguous.',
+            'No more county splits than the orginal plan.'
+        ]
+    }
+
+    report = {key: p_value_report(
+        key, table[key], initial_scores[key]) for key in scores}
+
+    return {**metadata, 'p_value_report': report}
 
 
 if __name__ == '__main__':
-    pprint.pprint(run_pa())
+    plan = sys.argv[1]
+    report = run_pa(plan)
+    pprint(report)
+
+    with open(f"./reports/p_values_{plan}.json", "w") as f:
+        json.dump(report, f)

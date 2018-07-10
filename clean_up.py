@@ -53,7 +53,7 @@ def main(shapefile_path='./wes_unitsPA/wes_units_PA.shp', graph_path='wes_graph.
                       for node in pa.graph.nodes}
 
         try:
-        plot_plan(shape, assignment, f"./plots/{plan}_after.svg")
+            plot_plan(shape, assignment, f"./plots/{plan}_after.svg")
         except Exception:
             log.error("There was an error while trying to plot", exc_info=1)
 
@@ -74,7 +74,7 @@ def plot_plan(df, plan, filepath):
 
     _, ax = plt.subplots(1)
     clean_df.plot(ax=ax, linewidth=0.5, edgecolor='0.5',
-                  column='assignment', categorical=True)
+                  column='assignment', categorical=True, cmap='tab20')
     ax.set_axis_off()
 
     plt.axis('equal')
@@ -82,4 +82,6 @@ def plot_plan(df, plan, filepath):
 
 
 if __name__ == '__main__':
-    main()
+    shapefile_path = './wes_unitsPA/wes_units_PA.shp'
+    shape = geopandas.read_file(shapefile_path)
+    plot_plan(shape, 'CD_remedia', './plots/plot.png')
