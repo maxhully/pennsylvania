@@ -15,8 +15,10 @@ from rundmcmc.proposals import propose_random_flip
 import functools
 import pprint
 
+plans = ['CD_CR', 'CD_remedia', 'GOV_4_1', 'TS_4_1']
 
-def run_pa(plan='TS_4_1'):
+
+def run_pa(plan='CD_CR'):
     graph = Graph.load('./wes_graph.json').graph
 
     assignment = {node: graph.nodes[node][plan] for node in graph.nodes}
