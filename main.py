@@ -5,7 +5,8 @@ from rundmcmc.updaters import (votes_updaters, Tally, perimeters, exterior_bound
                                interior_boundaries, boundary_nodes, cut_edges, polsby_popper,
                                cut_edges_by_part)
 from rundmcmc.scores import mean_median, mean_thirdian, efficiency_gap
-from rundmcmc.output import pipe_to_table, p_value_report
+from rundmcmc.run import pipe_to_table
+from rundmcmc.output import p_value_report
 
 import functools
 
