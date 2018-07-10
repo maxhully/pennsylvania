@@ -9,9 +9,10 @@ from rundmcmc.run import pipe_to_table
 from rundmcmc.output import p_value_report
 
 import functools
+import pprint
 
 
-def run_pa(plan='CD_CR'):
+def run_pa(plan='TS_4_1'):
     graph = Graph.load('./wes_graph.json').graph
 
     assignment = {node: graph.nodes[node][plan] for node in graph.nodes}
@@ -45,3 +46,7 @@ def run_pa(plan='CD_CR'):
     table = pipe_to_table(chain, scores)
 
     return {key: p_value_report(key, table[key], initial_scores[key]) for key in scores}
+
+
+if __name__ == '__main__':
+    pprint.pprint(run_pa())
