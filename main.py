@@ -41,7 +41,7 @@ def run_pa(plan='TS_4_1'):
     initial_scores = {key: score(partition)
                       for key, score in scores.items()}
 
-    chain = BasicChain(partition, total_steps=1000)
+    chain = BasicChain(partition, total_steps=1000000)
 
     table = pipe_to_table(chain, scores)
 
