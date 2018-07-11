@@ -34,7 +34,7 @@ def run_pa(plan, total_steps=100000):
         'interior_boundaries': interior_boundaries,
         'boundary_nodes': boundary_nodes,
         'cut_edges': cut_edges,
-        'areas': Tally('utm_area', alias='areas'),
+        'areas': Tally('area', alias='areas'),
         'polsby_popper': polsby_popper,
         'cut_edges_by_part': cut_edges_by_part
     }
