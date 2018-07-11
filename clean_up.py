@@ -70,7 +70,7 @@ def plot_plan(df, plan, filepath):
 
     clean_df = df.dropna(subset=['assignment'])
 
-    clean_df = reprojected(clean_df)
+    # clean_df = reprojected(clean_df)
 
     _, ax = plt.subplots(1)
     clean_df.plot(ax=ax, linewidth=0.5, edgecolor='0.5',
@@ -82,6 +82,20 @@ def plot_plan(df, plan, filepath):
 
 
 if __name__ == '__main__':
-    shapefile_path = './wes_unitsPA/wes_units_PA.shp'
+    shapefile_path = './data/wes_unitsPA/wes_units_PA.shp'
     shape = geopandas.read_file(shapefile_path)
-    plot_plan(shape, 'CD_remedia', './plots/plot.png')
+
+    pa = Graph.load('./wes_graph2.json')
+
+
+    for node in pa.graph.nodes:
+        if 'remedial' not in pa.graph.nodes[node]:
+            print(node)
+
+    print(
+        len([node for node in pa.graph.nodes if 'remedial' not in pa.graph.nodes[node]]))
+
+    assignment = {node: pa.graph.nodes[node]["remedial"]
+                  for node in pa.graph.nodes}
+
+    plot_plan(shape, assignment, './plots/remedial_matched.png')

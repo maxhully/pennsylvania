@@ -8,7 +8,8 @@ from rundmcmc.scores import mean_median, mean_thirdian, efficiency_gap
 from rundmcmc.run import pipe_to_table
 from rundmcmc.output import p_value_report
 from rundmcmc.chain import MarkovChain
-from rundmcmc.validity import Validator, within_percent_of_ideal_population, L1_reciprocal_polsby_popper, UpperBound
+from rundmcmc.validity import (Validator, within_percent_of_ideal_population,
+                               L_minus_1_polsby_popper, UpperBound, no_worse_L_minus_1_polsby_popper)
 from rundmcmc.accept import always_accept
 from rundmcmc.proposals import propose_random_flip
 
@@ -20,13 +21,13 @@ from pprint import pprint
 plans = ['CD_CR', 'CD_remedia', 'GOV_4_1', 'TS_4_1']
 
 
-def run_pa(plan, total_steps=10000000):
+def run_pa(plan, total_steps=100000):
     graph = Graph.load('./wes_graph.json').graph
 
     assignment = {node: graph.nodes[node][plan] for node in graph.nodes}
 
     updaters = {
-        **votes_updaters(['VoteA', 'VoteB']),
+        **votes_updaters(['T16SEND', 'T16SENR']),
         'population': Tally('POP100', alias='population'),
         'perimeters': perimeters,
         'exterior_boundaries': exterior_boundaries,
@@ -41,9 +42,10 @@ def run_pa(plan, total_steps=10000000):
     partition = Partition(graph, assignment, updaters)
 
     scores = {
-        'Mean-Median': functools.partial(mean_median, proportion_column_name='VoteA%'),
-        'Mean-Thirdian': functools.partial(mean_thirdian, proportion_column_name='VoteA%'),
-        'Efficiency Gap': functools.partial(efficiency_gap, col1='VoteA', col2='VoteB'),
+        'Mean-Median': functools.partial(mean_median, proportion_column_name='T16SEND%'),
+        'Mean-Thirdian': functools.partial(mean_thirdian, proportion_column_name='T16SEND%'),
+        'Efficiency Gap': functools.partial(efficiency_gap, col1='T16SEND', col2='T16SENR'),
+        'L^{-1} Polsby-Popper': L_minus_1_polsby_popper
     }
 
     initial_scores = {key: score(partition)
@@ -51,19 +53,36 @@ def run_pa(plan, total_steps=10000000):
 
     population_constraint = within_percent_of_ideal_population(partition, 0.01)
 
-    compactness_limit = L1_reciprocal_polsby_popper(partition) * 1.01
-    compactness_constraint = UpperBound(
-        L1_reciprocal_polsby_popper, compactness_limit)
-
     is_valid = Validator(default_constraints +
-                         [population_constraint, compactness_constraint])
+                         [population_constraint, no_worse_L_minus_1_polsby_popper])
 
     chain = MarkovChain(propose_random_flip, is_valid,
                         always_accept, partition, total_steps)
 
-    # chain = BasicChain(partition, total_steps=1000000)
+    # chain = BasicChain(partition, total_steps=100000)
 
     table = pipe_to_table(chain, scores)
+
+    initial_scores = {key: score(partition) for key, score in scores.items(
+    ) if key != 'L^{-1} Polsby-Popper'}
+
+    table = pipe_to_table(chain, scores)
+
+    fig, axes = plt.subplots(2, 2)
+
+    quadrants = {
+        'Mean-Median': (0, 0),
+        'Mean-Thirdian': (0, 1),
+        'Efficiency Gap': (1, 0),
+        'L^{-1} Polsby-Popper': (1, 1)
+    }
+
+    for key in scores:
+        quadrant = quadrants[key]
+        axes[quadrant].hist(table[key], bins=50)
+        axes[quadrant].set_title(key)
+        axes[quadrant].axvline(x=initial_scores[key], color='r')
+    plt.show()
 
     metadata = {
         'plan': plan,
@@ -77,7 +96,7 @@ def run_pa(plan, total_steps=10000000):
     }
 
     report = {key: p_value_report(
-        key, table[key], initial_scores[key]) for key in scores}
+        key, table[key], initial_scores[key]) for key in scores if key != 'L^{-1} Polsby-Popper'}
 
     return {**metadata, 'p_value_report': report}
 
