@@ -18,7 +18,23 @@ import functools
 import json
 from pprint import pprint
 
-plans = ['CD_CR', 'CD_remedia', 'GOV_4_1', 'TS_4_1']
+plans = ['2011', 'rounded11', 'Remedial', 'GOV_4_1', 'TS_4_1']
+elections = {
+    '2016 Presidential': ['T16PRESD', 'T16PRESR'],
+    '2016 Senate': ['T16SEND', 'T16SENR']
+}
+
+
+def get_scores(election):
+    D, R = elections[election]
+    return {
+        f"Mean-Median ({election})":
+            functools.partial(mean_median, proportion_column_name=f"{D}%"),
+        f"Mean-Thirdian ({election})":
+            functools.partial(mean_thirdian, proportion_column_name=f"{D}%"),
+        f"Efficiency Gap ({election})":
+            functools.partial(efficiency_gap, col1=D, col2=R)
+    }
 
 
 def run_pa(plan, total_steps=100000):
@@ -27,7 +43,8 @@ def run_pa(plan, total_steps=100000):
     assignment = {node: graph.nodes[node][plan] for node in graph.nodes}
 
     updaters = {
-        **votes_updaters(['T16SEND', 'T16SENR']),
+        **votes_updaters(elections["2016 Presidential"]),
+        **votes_updaters(elections["2016 Senate"]),
         'population': Tally('POP100', alias='population'),
         'perimeters': perimeters,
         'exterior_boundaries': exterior_boundaries,
@@ -42,9 +59,8 @@ def run_pa(plan, total_steps=100000):
     partition = Partition(graph, assignment, updaters)
 
     scores = {
-        'Mean-Median': functools.partial(mean_median, proportion_column_name='T16SEND%'),
-        'Mean-Thirdian': functools.partial(mean_thirdian, proportion_column_name='T16SEND%'),
-        'Efficiency Gap': functools.partial(efficiency_gap, col1='T16SEND', col2='T16SENR'),
+        **get_scores('2016 Senate'),
+        **get_scores('2016 Presidential'),
         'L^{-1} Polsby-Popper': L_minus_1_polsby_popper
     }
 
