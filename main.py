@@ -47,8 +47,8 @@ def set_up_chain(plan, total_steps, adjacency_type='queen'):
     assignment = {node: graph.nodes[node][plan] for node in graph.nodes}
 
     updaters = {
-        **votes_updaters(elections["2016_Presidential"]),
-        **votes_updaters(elections["2016_Senate"]),
+        **votes_updaters(elections["2016_Presidential"], election_name="2016_Presidential"),
+        **votes_updaters(elections["2016_Senate"], election_name="2016_Presidential"),
         'population': Tally('population', alias='population'),
         'perimeters': perimeters,
         'exterior_boundaries': exterior_boundaries,
