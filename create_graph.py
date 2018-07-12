@@ -2,6 +2,8 @@ import geopandas
 import logging
 
 from graphmaker.graph import Graph
+from clean_up import correct_islands
+from main import plans
 
 log = logging.getLogger(__name__)
 log.addHandler(logging.StreamHandler())
@@ -19,6 +21,13 @@ def create_graph_from_shapefile(shapefile_path='./data/wes_with_districtings/wes
     log.info(f"Saving the queen adjacency graph")
     pa_queen.add_columns_from_shapefile(
         shapefile_path, columns, id_column='wes_id')
+
+    # Fix nodes whose assignment is different from all their neighbors, and
+    # whose neighbors all have the same assignment.
+    # In practice, this affects one node's assignment in two plans. (Node '1')
+    for plan in plans:
+        correct_islands(pa_queen.graph, plan)
+
     pa_queen.save('./PA_queen.json')
 
     log.info(f"Creating the rook adjacency graph")
@@ -27,6 +36,10 @@ def create_graph_from_shapefile(shapefile_path='./data/wes_with_districtings/wes
     pa_rook.add_columns_from_shapefile(
         shapefile_path, columns, id_column='wes_id')
     log.info(f"Saving the queen adjacency graph")
+
+    for plan in plans:
+        correct_islands(pa_rook.graph, plan)
+
     pa_rook.save('./PA_rook.json')
 
 
