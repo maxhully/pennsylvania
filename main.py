@@ -13,6 +13,10 @@ from rundmcmc.validity import (Validator, within_percent_of_ideal_population,
 from rundmcmc.accept import always_accept
 from rundmcmc.proposals import propose_random_flip
 
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
 import sys
 import functools
 import json
@@ -37,14 +41,14 @@ def get_scores(election):
     }
 
 
-def set_up_chain(plan, adjacency_type='queen'):
+def set_up_chain(plan, total_steps, adjacency_type='queen'):
     graph = Graph.load(f"./PA_{adjacency_type}.json").graph
 
     assignment = {node: graph.nodes[node][plan] for node in graph.nodes}
 
     updaters = {
-        **votes_updaters(elections["2016 Presidential"]),
-        **votes_updaters(elections["2016 Senate"]),
+        **votes_updaters(elections["2016_Presidential"]),
+        **votes_updaters(elections["2016_Senate"]),
         'population': Tally('population', alias='population'),
         'perimeters': perimeters,
         'exterior_boundaries': exterior_boundaries,
@@ -63,16 +67,17 @@ def set_up_chain(plan, adjacency_type='queen'):
     is_valid = Validator(default_constraints +
                          [population_constraint, no_worse_L_minus_1_polsby_popper])
 
-    return MarkovChain(propose_random_flip, is_valid,
-                       always_accept, partition, total_steps)
+    return partition, MarkovChain(propose_random_flip, is_valid,
+                                  always_accept, partition, total_steps)
 
 
-def run_pa(plan, total_steps=100000):
-    chain = set_up_chain(plan)
+def run_pa(plan, total_steps=1000000):
+    partition, chain = set_up_chain(plan, total_steps)
 
-    scores = {**get_scores(election) for election in elections}
+    scores = {key: value for election in elections for key,
+              value in get_scores(election).items()}
 
-    scores['L_minus_1_Polsby-Popper']
+    scores['L_minus_1_Polsby-Popper'] = L_minus_1_polsby_popper
 
     initial_scores = {key: score(partition)
                       for key, score in scores.items()}
@@ -87,7 +92,9 @@ def run_pa(plan, total_steps=100000):
 
     for score in scores:
         plt.hist(table[score], bins=50)
-        plt.savefig(f"./{score}.svg")
+        plt.title(score.replace('_', ' '))
+        plt.savefig(f"./plots/{score}.svg")
+        plt.close()
 
     metadata = {
         'plan': plan,
