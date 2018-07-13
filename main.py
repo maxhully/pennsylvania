@@ -6,6 +6,7 @@ from rundmcmc.updaters import (votes_updaters, Tally, perimeters, exterior_bound
                                cut_edges_by_part)
 from rundmcmc.scores import mean_median, mean_thirdian, efficiency_gap
 from rundmcmc.output import p_value_report, ChainOutputTable
+from rundmcmc.run import pipe_to_table
 from rundmcmc.chain import MarkovChain
 from rundmcmc.validity import (Validator, within_percent_of_ideal_population,
                                L_minus_1_polsby_popper, UpperBound, SelfConfiguringLowerBound)
@@ -43,25 +44,6 @@ def how_many_seats(col1, col2):
     def function(partition):
         return sum(partition[col1][part] > partition[col2][part] for part in partition.parts)
     return function
-
-
-def pipe_to_table(chain, handlers, display=True, number_of_reports=100):
-    table = ChainOutputTable()
-    display_interval = math.floor(len(chain) / number_of_reports)
-    counter = 0
-    with open(f"./logs/flips_{now}.log", 'w') as f:
-        f.write("{ \"flips\": [\n")
-        for state in chain:
-            row = {key: handler(state) for key, handler in handlers.items()}
-            table.append(row)
-            f.write(json.dumps(state.flips) + ",")
-            if counter % display_interval == 0:
-                if display:
-                    print(f"Step {counter}")
-                    print(row)
-            counter += 1
-        f.write("\n]\n}\n")
-    return table
 
 
 def get_scores(election):
@@ -110,7 +92,7 @@ def set_up_chain(plan, total_steps, adjacency_type='queen'):
                                   always_accept, partition, total_steps)
 
 
-def run_pa(plan, total_steps=1000000):
+def run_pa(plan, total_steps=10000000):
     partition, chain = set_up_chain(plan, total_steps)
 
     scores = {key: value for election in elections for key,
@@ -125,14 +107,10 @@ def run_pa(plan, total_steps=1000000):
 
     table = pipe_to_table(chain, scores)
 
-    pathlib.Path('./plots/{plan}/{now}').mkdir(parents=True, exist_ok=True)
+    pathlib.Path(f"./plots/{plan}/{now}").mkdir(parents=True, exist_ok=True)
 
     for score in scores:
-        if 'Efficiency' in score:
-            plt.xlim(0.0, 0.30)
-        elif 'Mean-Median' in score:
-            plt.xlim(0.0, 0.60)
-        plt.hist(table[score], bins=100)
+        plt.hist(table[score], bins=50)
         plt.title(score.replace('_', ' '))
         plt.axvline(x=initial_scores[score], color='r')
         plt.savefig(f"./plots/{plan}/{now}/{score}.svg")

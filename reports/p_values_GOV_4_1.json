@@ -1,1 +1,62 @@
-{"plan": "GOV_4_1", "total_steps": 100000, "p_value_report": {"Mean-Median_(2016_Senate)": {"name": "Mean-Median_(2016_Senate)", "initial_plan_score": 0.03470273539264229, "fraction_as_high": 0.01191, "p_value": 0.1543372929657638, "opposite_p_value": 1.405766694725693}, "Mean-Thirdian_(2016_Senate)": {"name": "Mean-Thirdian_(2016_Senate)", "initial_plan_score": 0.09477830844928603, "fraction_as_high": 0.93506, "p_value": 1.367523308759306, "opposite_p_value": 0.3603886790674757}, "Efficiency_Gap_(2016_Senate)": {"name": "Efficiency_Gap_(2016_Senate)", "initial_plan_score": 0.09468051954484448, "fraction_as_high": 0.42535, "p_value": 0.92233399590387, "opposite_p_value": 1.0720541031123383}, "How_Many_D_Seats_(2016_Senate)": {"name": "How_Many_D_Seats_(2016_Senate)", "initial_plan_score": 7, "fraction_as_high": 0.75127, "p_value": 1.225781383444862, "opposite_p_value": 0.7053084431651162}}}
+{
+  "plan": "GOV_4_1",
+  "total_steps": 1000000,
+  "p_value_report": {
+    "Mean-Median_(2016_Presidential)": {
+      "name": "Mean-Median_(2016_Presidential)",
+      "initial_plan_score": 0.03384712461862244,
+      "fraction_as_high": 0.851505,
+      "p_value": 1.3049942528609082,
+      "opposite_p_value": 0.5449678889622763
+    },
+    "Mean-Thirdian_(2016_Presidential)": {
+      "name": "Mean-Thirdian_(2016_Presidential)",
+      "initial_plan_score": 0.1031714648377014,
+      "fraction_as_high": 0.315694,
+      "p_value": 0.7945992700726574,
+      "opposite_p_value": 1.169876916602768
+    },
+    "Efficiency_Gap_(2016_Presidential)": {
+      "name": "Efficiency_Gap_(2016_Presidential)",
+      "initial_plan_score": 0.09030777759857735,
+      "fraction_as_high": 7.9e-5,
+      "p_value": 0.012569805089976535,
+      "opposite_p_value": 1.4141576998340744
+    },
+    "How_Many_D_Seats_(2016_Presidential)": {
+      "name": "How_Many_D_Seats_(2016_Presidential)",
+      "initial_plan_score": 7,
+      "fraction_as_high": 1.0,
+      "p_value": 1.4142135623730951,
+      "opposite_p_value": 0.0
+    },
+    "Mean-Median_(2016_Senate)": {
+      "name": "Mean-Median_(2016_Senate)",
+      "initial_plan_score": 0.03470273539264229,
+      "fraction_as_high": 0.701844,
+      "p_value": 1.1847733960551274,
+      "opposite_p_value": 0.7722124060127498
+    },
+    "Mean-Thirdian_(2016_Senate)": {
+      "name": "Mean-Thirdian_(2016_Senate)",
+      "initial_plan_score": 0.09477830844928603,
+      "fraction_as_high": 0.002701,
+      "p_value": 0.07349829930005183,
+      "opposite_p_value": 1.4123023755556032
+    },
+    "Efficiency_Gap_(2016_Senate)": {
+      "name": "Efficiency_Gap_(2016_Senate)",
+      "initial_plan_score": 0.09468051954484448,
+      "fraction_as_high": 0.269873,
+      "p_value": 0.7346740773975899,
+      "opposite_p_value": 1.2084096987363184
+    },
+    "How_Many_D_Seats_(2016_Senate)": {
+      "name": "How_Many_D_Seats_(2016_Senate)",
+      "initial_plan_score": 7,
+      "fraction_as_high": 0.73038,
+      "p_value": 1.2086190466809632,
+      "opposite_p_value": 0.7343296262578544
+    }
+  }
+}
